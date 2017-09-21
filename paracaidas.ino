@@ -4,7 +4,7 @@
 #include <Adafruit_Sensor.h>
 
 float altura,altura_ref,altura_max,altura_minima;
-float presion=560; //la presion local, bogota esta fucking arriba
+float presion=549; //la presion local, bogota esta fucking arriba
 Adafruit_BMP280 bme;//I2C
 
 void setup(){
@@ -36,5 +36,6 @@ void loop(){
   Serial.print("altura : ");
   Serial.print(altura);
 
-  delay(500);
+  delay(100);
+
 }
