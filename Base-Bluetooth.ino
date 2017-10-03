@@ -1,6 +1,6 @@
 int led13=13;
 int estado=0;
-
+int estado_anterior=0;
 void setup(){
   Serial.begin(9600);
   pinMode(led13,OUTPUT);
@@ -16,10 +16,11 @@ void loop(){
  if(Serial.available()>0){
  estado = Serial.read();
  }
-  despegue(estado);
+  despegue(estado,estado_anterior);
+  estado_anterior+=1;//x se vuelve cero para evita que se vuelva a ejecutar
 }
-void despegue(int x){
-    if (x =='a'){
+void despegue(int x,int y){
+    if (x =='a'&& y==0){
      Serial.write(x);
      digitalWrite(led13,HIGH);//se prende el led, dando señal de que funciona
      digitalWrite(2,HIGH);//motor
@@ -33,6 +34,6 @@ void despegue(int x){
      delay(2500);//tiempo que se ejecuta, 2.5 segundos
      digitalWrite(2,LOW);//se apaga
      digitalWrite(3,LOW);
-     x=0;//x se vuelve cero para evita que se vuelva a ejecutar
     }
 }
+
