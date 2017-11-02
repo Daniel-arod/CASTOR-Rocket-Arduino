@@ -13,14 +13,13 @@ String visual  ;
 String texto = " / ";
 byte led_amarillo=4;
 void setup(){
-  pinMode(led_amarillo,OUTPUT);
   Serial.begin(9600);
   if(!bme.begin()){
     Serial.println("error");
   }
   
   servo1.attach(9);
-  servo1.write(20);
+    servo1.write(20);
 
   delay (500);
   altura_ref=bme.readAltitude(presion);
@@ -36,22 +35,21 @@ void loop(){
     if(altura>altura_max){
     altura_max=altura;
     } 
-    if (altura-altura_pasada<=-0.5){
-      delay(150);
+    if (altura-altura_pasada<=-0.2){
+      delay(40);
       analizar_altura();
-      if(altura-altura_pasada<=-1){
-          delay(150);
+      if(altura-altura_pasada<=-0.5){
+          delay(40);
           analizar_altura();
-          if(altura-altura_pasada<=-1.5){
-              
-              digitalWrite(led_amarillo,HIGH);  
+          if(altura-altura_pasada<=-0.8){
+              servo1.write(180); 
               }
       }
    }
 
     visual = altura + texto + altura_max;  
     Serial.println(visual);
-    delay(500);
+    delay(200);
 }
 
 void analizar_altura(){
