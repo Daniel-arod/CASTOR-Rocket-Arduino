@@ -1,58 +1,30 @@
 #include<Servo.h>
-#include<Wire.h>
-#include<SPI.h>
-#include <Adafruit_BMP280.h>
-#include <Adafruit_Sensor.h>
+int led13=13;
+int estado=0;
 
 Servo servo1;
-float altura = 0  ,altura_ref = 0,altura_max = 0,altura_minima = 0,altura_pasada=0,apogeo=0;
 
-float presion=560; //la presion local, bogota esta fucking arriba
-Adafruit_BMP280 bme;//I2C
-String visual  ;
-String texto = " / ";
-byte led_amarillo=4;
 void setup(){
   Serial.begin(9600);
-  if(!bme.begin()){
-    Serial.println("error");
-  }
-  
+  pinMode(led13,OUTPUT);
   servo1.attach(9);
-    servo1.write(20);
-
-  delay (500);
-  altura_ref=bme.readAltitude(presion);
+  servo1.write(0);
+ 
 }
 
 void loop(){
-    Serial.begin(9600);
-    if(!bme.begin()){
-       Serial.print("error");
-       while(!bme.begin());
-  }
-    analizar_altura();
-    if(altura>altura_max){
-    altura_max=altura;
-    } 
-    if (altura-altura_pasada<=-0.2){
-      delay(40);
-      analizar_altura();
-      if(altura-altura_pasada<=-0.5){
-          delay(40);
-          analizar_altura();
-          if(altura-altura_pasada<=-0.8){
-              servo1.write(180); 
-              }
-      }
-   }
+ digitalWrite(13,LOW);
 
-    visual = altura + texto + altura_max;  
-    Serial.println(visual);
-    delay(200);
+ if(Serial.available()>0){
+ estado = Serial.read();
+ }
+  despegue(estado);
+ 
 }
-
-void analizar_altura(){
-   altura= bme.readAltitude(presion)-altura_ref;
+void despegue(int x){
+    if (x =='a'){
+     Serial.write(x);
+     digitalWrite(13,HIGH);
+     servo1.write(180);
+    }
 }
-
