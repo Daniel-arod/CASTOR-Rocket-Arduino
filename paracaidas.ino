@@ -1,19 +1,15 @@
+//LIBRERIAS :
 #include<Wire.h>
 #include<SPI.h>
 #include <Adafruit_BMP280.h>
 #include <Adafruit_Sensor.h>
 
-//VARIABLES GLOBALES:
-int16_t valores_n; //valores sin refinar
+//VARIABLES GLOBALES :
 
-unsigned long pasado = 0; //es el tiempo inicial, tambien en milisengundos
-int ahora;//es un contador que cuenta los milisegundos pasados
-int tiempo_muestreo = 1;
-
-float altura_actual = 0;  //Es la altura que mide el sensor en un instante k
+float valores_n = 0;  //Es la altura que mide el sensor en un instante k, valores sin refinar
 float altura_ref = 0; //se hace una medicion y se pone como valor negativo, de tal manera que la diferencia entre los futuros datos
                       // y la altura actual sea la correcta, si no se mueve se mantiene en cero
-
+float valores_s = 0; //Son los valores corregidos por el promedio de los datos, seran los que se usaran para las operaciones
 
 //VARIABLES NO USADAS (TEMPORAL):
 /*float altura_pasada=0;
@@ -42,16 +38,16 @@ void loop(){
     while(!bme.begin());
   }//fin de la iniciacion del sensor
 
-
-  ahora = millis();//es un contador que cuenta los milisegundos pasados
   
-  int cambio_tiempo = ahora - pasado;
-  if(cambio_tiempo>=tiempo_muestreo){
-    Serial.println(cambio_tiempo); 
-    pasado = ahora;
+  analizar_altura();
+  float pasado_1 = 0; //va a ser la referencia para promediar los datos
+  pasado_1=valores_n;
+  valores_s = (valores_n+pasado_1)/2;
    
-  }analizar_altura();
+  Serial.println(valores_s);
+  delay(8);//Es lo maximo que puedo usar como tiempo de muestreo, ademas tambien es mas sencillo que el P del PID y da los mismos resultados
 
+  
     /*if(altura>altura_max){
     altura_max=altura;
     } 
@@ -68,10 +64,10 @@ void loop(){
    }*/
 
   
-    Serial.println(altura_actual);
-    delay(200);
+    
+
 }
 
 void analizar_altura(){
-   altura_actual= bme.readAltitude(presion)-altura_ref;
+   valores_n= bme.readAltitude(presion)-altura_ref;
 }
