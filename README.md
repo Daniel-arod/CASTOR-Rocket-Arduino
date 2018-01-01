@@ -17,7 +17,7 @@ hidráulico, el cual estaba lleno de picos.
 
 Esta será la primera versión porque hasta ahora me decido en publicar un documento formal para tener un registro de los avances del proyecto.
 
-MEJORAS::
+MEJORAS:
 -Ya no tiene saltos en sus medidas(no tan grandes).
  -Ya no toma datos negativos (que no tienen sentido porque la condición inicial siempre  sea el suelo).
 -El tiempo de toma de datos y realización de operaciones pasó de ser de 200 ms a 8ms (es lo maximo que me deja hacer tomar el Arduino Uno)
