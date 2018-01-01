@@ -18,7 +18,7 @@ float altura_ref = 0; //se hace una medicion y se pone como valor negativo, de t
                       // y la altura actual sea la correcta, si no se mueve se mantiene en cero
 
 float valores_s = 0; //Son los valores corregidos
-float altura_max = 0;
+float altura_maxima = 0;
  
 float presion=560; //la presion local, bogota esta fucking arriba
 Adafruit_BMP280 bme;//I2C
@@ -52,24 +52,29 @@ void loop(){
   
   analizar_altura();//toma el dato de la altura actual
   tierra(); //verifica que el dato no sea menor que cero
-  correccion();
-  /*if(altura_maxima>valores_s){
-    altura_maxima = valores_s;
-  }
+  correccion();//devuelve los datos corregidos
   
-  if(correcto_anterior-valores_s>15){
-    float verificacion = correcto_anterior;
-    if(verificacion-valores_s>20){
-      if(verificacion-valores_s>25){
+  if(correccion()>altura_maxima){
+    altura_maxima = correccion();
+  }
+
+  
+  if(altura_maxima>-correccion()>5){
+    correccion();
+    delay(10);
+    if(altura_maxima>-correccion()>10){
+      correccion();
+      delay(10);
+      if(altura_maxima>-correccion()>15){
         servomotor.write(180);//movemos el servomotor para que active el paracaidas
       }
     }
-  }*/
+  }
    
 
   
      
-  Serial.println(valores_s/10); //imprimimos en pantalla las mediciones corregidas  
+  Serial.println(valores_s); //imprimimos en pantalla las mediciones corregidas  
   delay(8);//Es lo maximo que puedo usar como tiempo de muestreo, ademas tambien es mas sencillo que el P del PID y da los mismos resultados
 
   
@@ -116,3 +121,4 @@ float correccion(){ //Es una funcion que devuelve los datos corregidos, bestante
       correcto_anterior = valores_s;
     }
 }
+
