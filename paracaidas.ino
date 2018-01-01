@@ -1,29 +1,33 @@
+//VERSION 1.02
+
 //LIBRERIAS :
+   //BMP 280
 #include<Wire.h>
 #include<SPI.h>
 #include <Adafruit_BMP280.h>
 #include <Adafruit_Sensor.h>
+
+  //SERVO MOTOR
+#include<Servo.h>
+
 
 //VARIABLES GLOBALES :
 
 float valores_n = 0;  //Es la altura que mide el sensor en un instante k, valores sin refinar
 float altura_ref = 0; //se hace una medicion y se pone como valor negativo, de tal manera que la diferencia entre los futuros datos
                       // y la altura actual sea la correcta, si no se mueve se mantiene en cero
-int valores_prom = 0; //Son los valores corregidos por el promedio de los datos, seran los que se usaran para las operaciones
-float valores_s = 0;
 
-
-//VARIABLES NO USADAS (TEMPORAL):
-/*float altura_pasada=0;
-  float altura_max = 0;
- */
+float valores_s = 0; //Son los valores corregidos
+float altura_max = 0;
+ 
 float presion=560; //la presion local, bogota esta fucking arriba
 Adafruit_BMP280 bme;//I2C
+Servo servomotor;
 
-
-//TEXTO QUE SE MUESTRA EN EL SERIAL:
-String texto_completo;
-
+//FUNCIONES A USAR:
+void analizar_altura();//amplia la señal inicial para que las opperaciones sean mas sencillas
+void tierra();//corrige los datos negativos igualandolos a cero
+float correccion();//devuelve los datos corregidos, util para hacer operaciones
 
 void setup(){
   Serial.begin(9600);//Es lo que inicia el BMP280
@@ -33,6 +37,8 @@ void setup(){
   
   delay(100);//una pequeña espera para darle tiempo de iniciar
   altura_ref=bme.readAltitude(presion);//la diferencia para que el valor inicial sea cero
+  servomotor.attach(9);//Iniciamos el servo motor
+  servomotor.write(10);//lo movemos para tener la verificacion de que funciona
 }
 
 
@@ -46,21 +52,20 @@ void loop(){
   
   analizar_altura();//toma el dato de la altura actual
   tierra(); //verifica que el dato no sea menor que cero
+  correccion();
+  /*if(altura_maxima>valores_s){
+    altura_maxima = valores_s;
+  }
   
-  int pasado_1 = valores_n;//crea una variable que guarda la altura inmediatamente anterior
-  int correcto_anterior = 0;
-  
-  if(valores_n-pasado_1>30){//si la diferencia entre la altura actual y la anterior es superior a 30
-      valores_s = (valores_n+pasado_1)/2;//se promedia para equilibrar los datos
-      valores_s = correcto_anterior+ (0.1)*(pasado_1-correcto_anterior);
-      correcto_anterior = valores_s;
-  }else{//si no lo es, los valores correctos corresponderan a los valores medidos
-      valores_s = correcto_anterior+ (0.1)*(pasado_1-correcto_anterior);
-      correcto_anterior = valores_s;
+  if(correcto_anterior-valores_s>15){
+    float verificacion = correcto_anterior;
+    if(verificacion-valores_s>20){
+      if(verificacion-valores_s>25){
+        servomotor.write(180);//movemos el servomotor para que active el paracaidas
+      }
     }
-
-  
-  //texto_completo = "valor actual = "+String(valores_s); 
+  }*/
+   
 
   
      
@@ -98,5 +103,16 @@ void tierra(){ //la gracia de la funcion es que las mediciones, por logica
     }
 }
 
-
-
+float correccion(){ //Es una funcion que devuelve los datos corregidos, bestante util para poder hacer operaciones lugeo
+  int pasado_1 = valores_n;//crea una variable que guarda la altura inmediatamente anterior
+  int correcto_anterior = 0;
+  
+  if(valores_n-pasado_1>30){//si la diferencia entre la altura actual y la anterior es superior a 30
+      valores_s = (valores_n+pasado_1)/2;//se promedia para equilibrar los datos
+      valores_s = correcto_anterior+ (0.1)*(pasado_1-correcto_anterior);
+      correcto_anterior = valores_s;
+  }else{//si no lo es, los valores correctos corresponderan a los valores medidos
+      valores_s = correcto_anterior+ (0.1)*(pasado_1-correcto_anterior);
+      correcto_anterior = valores_s;
+    }
+}
